@@ -13,7 +13,8 @@ from datetime import datetime
 from enum import Enum
 from pathlib import Path
 from pyunpack import Archive
-from typing import Final, List, Optional, Union
+from tkinter import filedialog
+from typing import Final, List, Optional, Tuple, Union
 
 
 __all__: Final[List[str]] = ["FileManager"]
@@ -70,6 +71,11 @@ class FileManager:
 
     Methods:
     -------
+    ask_and_open_file: Asks the user to open a file
+    ask_and_open_files: Asks the user to open files
+    ask_and_open_file_name: Asks the user to open a file name
+    ask_and_open_file_names: Asks the user to open file names
+    ask_and_save_file: Asks the user to save a file
     create_directory: Creates a directory at the given path
     create_file: Creates a file at the given path
     create_symlink: Creates a symlink at the given path
@@ -121,6 +127,400 @@ class FileManager:
 
         # Return the path
         return path
+
+    @classmethod
+    def ask_and_open_directory(
+        cls,
+        title: str,
+        initialdir: Optional[Union[str, Path]] = None,
+    ) -> Optional[str]:
+        """
+        Asks the user to open a directory
+
+        :param title: The title of the directory dialog
+        :type title: str
+        :param initialdir: The initial directory to open the directory dialog at
+        :type initialdir: Optional[Union[str, Path]]
+
+        :return: The path to the directory if the user opened it, None otherwise
+        :rtype: Optional[str]
+        """
+
+        # Check if the initial directory has been passed
+        if initialdir:
+            # Convert the initial directory to a Path object
+            initialdir = cls._convert_to_path(path=initialdir)
+
+            # Check if the initial directory exists
+            if not cls.does_directory_exist(path=initialdir):
+                # Log the warning
+                print(
+                    f"{datetime.now().isoformat()} | {cls.__name__} | WARNING | Opening directory at '{initialdir.resolve()}' impossible: directory does not exist. Aborting..."
+                )
+
+                # Return None
+                return None
+
+        try:
+            # Ask the user to open a directory
+            return filedialog.askdirectory(
+                initialdir=initialdir,
+                title=title,
+            )
+        except Exception:
+            # Print the error
+            print(
+                f"{datetime.now().isoformat()} | {cls.__name__} | ERROR | Caught an exception while attempting to open directory at '{initialdir.resolve()}':\n{traceback.format_exc()}"
+            )
+
+            # Return None
+            return None
+
+    @classmethod
+    def ask_and_open_file(
+        cls,
+        title: str,
+        filetypes: List[Tuple[str, str]],
+        initialdir: Optional[Union[str, Path]] = None,
+        initialfile: Optional[Union[str, Path]] = None,
+    ) -> Optional[str]:
+        """
+        Asks the user to open a file
+
+        :param title: The title of the file dialog
+        :type title: str
+        :param filetypes: The file types to filter by
+        :type filetypes: List[Tuple[str, str]]
+        :param initialdir: The initial directory to open the file dialog at
+        :type initialdir: Optional[Union[str, Path]]
+        :param initialfile: The initial file to open the file dialog at
+        :type initialfile: Optional[Union[str, Path]]
+
+        :return: The path to the file if the user opened it, None otherwise
+        :rtype: Optional[str]
+        """
+
+        # Check if the initial directory has been passed
+        if initialdir:
+            # Convert the initial directory to a Path object
+            initialdir = cls._convert_to_path(path=initialdir)
+
+            # Check if the initial directory exists
+            if not cls.does_directory_exist(path=initialdir):
+                # Log the warning
+                print(
+                    f"{datetime.now().isoformat()} | {cls.__name__} | WARNING | Opening file at '{initialdir.resolve()}' impossible: directory does not exist. Aborting..."
+                )
+
+                # Return None
+                return None
+
+        # Check if the initial file has been passed
+        if initialfile:
+            # Convert the initial file to a Path object
+            initialfile = cls._convert_to_path(path=initialfile)
+
+            # Check if the initial file exists
+            if not cls.does_file_exist(path=initialfile):
+                # Log the warning
+                print(
+                    f"{datetime.now().isoformat()} | {cls.__name__} | WARNING | Opening file at '{initialfile.resolve()}' impossible: file does not exist. Aborting..."
+                )
+
+                # Return None
+                return None
+
+        try:
+            # Ask the user to open a file
+            return filedialog.askopenfilename(
+                filetypes=filetypes,
+                initialdir=initialdir,
+                initialfile=initialfile,
+                title=title,
+            )
+        except Exception:
+            # Print the error
+            print(
+                f"{datetime.now().isoformat()} | {cls.__name__} | ERROR | Caught an exception while attempting to open file at '{initialfile.resolve()}':\n{traceback.format_exc()}"
+            )
+
+            # Return None
+            return None
+
+    @classmethod
+    def ask_and_open_files(
+        cls,
+        title: str,
+        filetypes: List[Tuple[str, str]],
+        initialdir: Optional[Union[str, Path]] = None,
+        initialfile: Optional[Union[str, Path]] = None,
+    ) -> Optional[Union[Tuple[str, ...], str]]:
+        """
+        Asks the user to open files
+
+        :param title: The title of the file dialog
+        :type title: str
+        :param filetypes: The file types to filter by
+        :type filetypes: List[Tuple[str, str]]
+        :param initialdir: The initial directory to open the file dialog at
+        :type initialdir: Optional[Union[str, Path]]
+        :param initialfile: The initial file to open the file dialog at
+        :type initialfile: Optional[Union[str, Path]]
+
+        :return: The paths to the files if the user opened them, None otherwise
+        :rtype: Optional[Union[Tuple[str, ...], str]]
+        """
+
+        # Check if the initial directory has been passed
+        if initialdir:
+            # Convert the initial directory to a Path object
+            initialdir = cls._convert_to_path(path=initialdir)
+
+            # Check if the initial directory exists
+            if not cls.does_directory_exist(path=initialdir):
+                # Log the warning
+                print(
+                    f"{datetime.now().isoformat()} | {cls.__name__} | WARNING | Opening files at '{initialdir.resolve()}' impossible: directory does not exist. Aborting..."
+                )
+
+                # Return None
+                return None
+
+        # Check if the initial file has been passed
+        if initialfile:
+            # Convert the initial file to a Path object
+            initialfile = cls._convert_to_path(path=initialfile)
+
+            # Check if the initial file exists
+            if not cls.does_file_exist(path=initialfile):
+                # Log the warning
+                print(
+                    f"{datetime.now().isoformat()} | {cls.__name__} | WARNING | Opening files at '{initialfile.resolve()}' impossible: file does not exist. Aborting..."
+                )
+
+                # Return None
+                return None
+
+        try:
+            # Ask the user to open files
+            return filedialog.askopenfilenames(
+                filetypes=filetypes,
+                initialdir=initialdir,
+                initialfile=initialfile,
+                title=title,
+            )
+        except Exception:
+            # Print the error
+            print(
+                f"{datetime.now().isoformat()} | {cls.__name__} | ERROR | Caught an exception while attempting to open files at '{initialfile.resolve()}':\n{traceback.format_exc()}"
+            )
+
+            # Return None
+            return None
+
+    @classmethod
+    def ask_and_open_file_name(
+        cls,
+        title: str,
+        filetypes: List[Tuple[str, str]],
+        initialdir: Optional[Union[str, Path]] = None,
+        initialfile: Optional[Union[str, Path]] = None,
+    ) -> Optional[str]:
+        """
+        Asks the user to open a file name
+
+        :param title: The title of the file dialog
+        :type title: str
+        :param filetypes: The file types to filter by
+        :type filetypes: List[Tuple[str, str]]
+        :param initialdir: The initial directory to open the file dialog at
+        :type initialdir: Optional[Union[str, Path]]
+        :param initialfile: The initial file to open the file dialog at
+        :type initialfile: Optional[Union[str, Path]]
+
+        :return: The path to the file if the user opened it, None otherwise
+        :rtype: Optional[str]
+        """
+
+        # Check if the initial directory has been passed
+        if initialdir:
+            # Convert the initial directory to a Path object
+            initialdir = cls._convert_to_path(path=initialdir)
+
+            # Check if the initial directory exists
+            if not cls.does_directory_exist(path=initialdir):
+                # Log the warning
+                print(
+                    f"{datetime.now().isoformat()} | {cls.__name__} | WARNING | Opening file name at '{initialdir.resolve()}' impossible: directory does not exist. Aborting..."
+                )
+
+                # Return None
+                return None
+
+        # Check if the initial file has been passed
+        if initialfile:
+            # Convert the initial file to a Path object
+            initialfile = cls._convert_to_path(path=initialfile)
+
+            # Check if the initial file exists
+            if not cls.does_file_exist(path=initialfile):
+                # Log the warning
+                print(
+                    f"{datetime.now().isoformat()} | {cls.__name__} | WARNING | Opening file name at '{initialfile.resolve()}' impossible: file does not exist. Aborting..."
+                )
+
+                # Return None
+                return None
+
+        try:
+            # Ask the user to open a file name
+            return filedialog.askopenfilename(
+                filetypes=filetypes,
+                initialdir=initialdir,
+                initialfile=initialfile,
+                title=title,
+            )
+        except Exception:
+            # Print the error
+            print(
+                f"{datetime.now().isoformat()} | {cls.__name__} | ERROR | Caught an exception while attempting to open file name at '{initialfile.resolve()}':\n{traceback.format_exc()}"
+            )
+
+            # Return None
+            return None
+
+    @classmethod
+    def ask_and_open_file_names(
+        cls,
+        title: str,
+        filetypes: List[Tuple[str, str]],
+        initialdir: Optional[Union[str, Path]] = None,
+        initialfile: Optional[Union[str, Path]] = None,
+    ) -> Optional[Union[Tuple[str, ...], str]]:
+        """
+        Asks the user to open file names
+
+        :param title: The title of the file dialog
+        :type title: str
+        :param filetypes: The file types to filter by
+        :type filetypes: List[Tuple[str, str]]
+        :param initialdir: The initial directory to open the file dialog at
+        :type initialdir: Optional[Union[str, Path]]
+        :param initialfile: The initial file to open the file dialog at
+        :type initialfile: Optional[Union[str, Path]]
+
+        :return: The paths to the files if the user opened them, None otherwise
+        :rtype: Optional[Union[Tuple[str, ...], str]]
+        """
+
+        # Check if the initial directory has been passed
+        if initialdir:
+            # Convert the initial directory to a Path object
+            initialdir = cls._convert_to_path(path=initialdir)
+
+            # Check if the initial directory exists
+            if not cls.does_directory_exist(path=initialdir):
+                # Log the warning
+                print(
+                    f"{datetime.now().isoformat()} | {cls.__name__} | WARNING | Opening file names at '{initialdir.resolve()}' impossible: directory does not exist. Aborting..."
+                )
+
+                # Return None
+                return None
+
+        # Check if the initial file has been passed
+        if initialfile:
+            # Convert the initial file to a Path object
+            initialfile = cls._convert_to_path(path=initialfile)
+
+            # Check if the initial file exists
+            if not cls.does_file_exist(path=initialfile):
+                # Log the warning
+                print(
+                    f"{datetime.now().isoformat()} | {cls.__name__} | WARNING | Opening file names at '{initialfile.resolve()}' impossible: file does not exist. Aborting..."
+                )
+
+                # Return None
+                return None
+
+        try:
+            # Ask the user to open file names
+            return filedialog.askopenfilenames(
+                filetypes=filetypes,
+                initialdir=initialdir,
+                initialfile=initialfile,
+                title=title,
+            )
+        except Exception:
+            # Print the error
+            print(
+                f"{datetime.now().isoformat()} | {cls.__name__} | ERROR | Caught an exception while attempting to open file names at '{initialfile.resolve()}':\n{traceback.format_exc()}"
+            )
+
+            # Return None
+            return None
+
+    @classmethod
+    def ask_and_save_file(
+        cls,
+        title: str,
+        filetypes: List[Tuple[str, str]],
+        initialdir: Optional[Union[str, Path]] = None,
+        initialfile: Optional[Union[str, Path]] = None,
+    ) -> Optional[str]:
+        """
+        Asks the user to save a file
+
+        :param title: The title of the file dialog
+        :type title: str
+        :param filetypes: The file types to filter by
+        :type filetypes: List[Tuple[str, str]]
+        :param initialdir: The initial directory to open the file dialog at
+        :type initialdir: Optional[Union[str, Path]]
+        :param initialfile: The initial file to open the file dialog at
+        :type initialfile: Optional[Union[str, Path]]
+
+        :return: The path to the file if the user saved it, None otherwise
+        :rtype: Optional[str]
+        """
+
+        # Check if the initial directory has been passed
+        if initialdir:
+            # Convert the initial directory to a Path object
+            initialdir = cls._convert_to_path(path=initialdir)
+
+            # Check if the initial directory exists
+            if not cls.does_directory_exist(path=initialdir):
+                # Log the warning
+                print(
+                    f"{datetime.now().isoformat()} | {cls.__name__} | WARNING | Saving file at '{initialdir.resolve()}' impossible: directory does not exist. Aborting..."
+                )
+
+                # Return None
+                return None
+
+        # Check if the initial file has been passed
+        if initialfile:
+            # Convert the initial file to a Path object
+            initialfile = cls._convert_to_path(path=initialfile)
+
+            # Check if the initial file exists
+            if not cls.does_file_exist(path=initialfile):
+                # Log the warning
+                print(
+                    f"{datetime.now().isoformat()} | {cls.__name__} | WARNING | Saving file at '{initialfile.resolve()}' impossible: file does not exist. Aborting..."
+                )
+
+                # Return None
+                return None
+
+        # Ask the user to save a file
+        return filedialog.asksaveasfilename(
+            filetypes=filetypes,
+            initialdir=initialdir,
+            initialfile=initialfile,
+            title=title,
+        )
 
     @classmethod
     def copy_directory(
