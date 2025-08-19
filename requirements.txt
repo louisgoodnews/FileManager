@@ -1,0 +1,3 @@
+aiofiles~=24.1.0
+patool~=4.0.1
+pyunpack~=0.3
