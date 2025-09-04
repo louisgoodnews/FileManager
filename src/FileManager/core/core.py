@@ -4,6 +4,7 @@ Date: 2025-08-19
 """
 
 import aiofiles
+import asyncio
 import os
 import shutil
 import sys
@@ -123,7 +124,7 @@ class FileManager:
             Path,
         ):
             # Convert the path to a Path object
-            path = Path(path=path)
+            path = Path(path)
 
         # Return the path
         return path
@@ -1201,8 +1202,9 @@ class FileManager:
         cls,
         source: Union[str, Path],
         file_task: FileTask,
-        target: Optional[Union[str, Path]] = None,
+        content: Optional[str] = None,
         new_name: Optional[str] = None,
+        target: Optional[Union[str, Path]] = None,
     ) -> Union[bool, str]:
         """
         Opens a file at the given path
@@ -1211,10 +1213,12 @@ class FileManager:
         :type source: Union[str, Path]
         :param file_task: The file task to perform
         :type file_task: FileTask
-        :param target: The target file to open to
-        :type target: Optional[Union[str, Path]]
+        :param content: The content to write to a file
+        :type content: Optional[str]
         :param new_name: The new name of the file
         :type new_name: Optional[str]
+        :param target: The target file to open to
+        :type target: Optional[Union[str, Path]]
 
         :return: True if the file was opened, False otherwise
         :rtype: Union[bool, str]
@@ -1324,7 +1328,7 @@ class FileManager:
         if file_task == "write":
             return cls.write_file(
                 path=source,
-                content=target,
+                content=content,
             )
 
     @classmethod
@@ -1360,7 +1364,7 @@ class FileManager:
                     file=path,
                     mode="r",
                 ) as file:
-                    # Return the content of the file
+                    # Get and return the content of the file
                     return await file.read()
             except Exception:
                 # Print the error
@@ -1385,7 +1389,7 @@ class FileManager:
             return None
 
         # Run the async function and return the result
-        return asyncio.run(_read_file(path=path))
+        return asyncio.run(main=_read_file(path=path))
 
     @classmethod
     def rename_directory(
@@ -1675,10 +1679,10 @@ class FileManager:
         path = cls._convert_to_path(path=path)
 
         # Check if the file exists
-        if cls.does_file_exist(path=path):
+        if not cls.does_file_exist(path=path):
             # Log the warning
             print(
-                f"{datetime.now().isoformat()} | {cls.__name__} | WARNING | Writing content to file at '{path.resolve()}' impossible: file already exists. Aborting..."
+                f"{datetime.now().isoformat()} | {cls.__name__} | WARNING | Writing content to file at '{path.resolve()}' impossible: file does not exist. Aborting..."
             )
 
             # Return False
@@ -1686,7 +1690,7 @@ class FileManager:
 
         # Run the async function and return the result
         return asyncio.run(
-            _write_file(
+            main=_write_file(
                 path=path,
                 content=content,
             )

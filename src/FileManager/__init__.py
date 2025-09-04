@@ -5,7 +5,7 @@ Date: 2025-08-25
 
 from typing import Final, List, Literal
 
-from core.core import FileManager, FileTask
+from .core.core import FileManager, FileTask
 
 
 __all__: Final[List[str]] = [
